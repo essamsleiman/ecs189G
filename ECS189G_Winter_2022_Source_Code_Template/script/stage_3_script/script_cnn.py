@@ -1,5 +1,5 @@
 from code.stage_3_code.Dataset_Loader import Dataset_Loader
-from code.stage_3_code.Method_MLP import Method_MLP
+from code.stage_3_code.Method_CNN import Method_CNN
 from code.stage_3_code.Result_Saver import Result_Saver
 from code.stage_3_code.Setting_KFold_CV import Setting_KFold_CV
 from code.stage_3_code.Setting_Train_Test_Split import Setting_Train_Test_Split
@@ -26,7 +26,7 @@ if 1:
     test_data_obj.dataset_source_file_name = 'MNIST'
     test_data_obj.dataset_type = 'test'
 
-    method_obj = Method_MLP('multi-layer perceptron', '')
+    method_obj = Method_CNN('convolutional neural network', '')
 
     result_obj = Result_Saver('saver', '')
     result_obj.result_destination_folder_path = '../../result/stage_3_result/MLP_'

@@ -13,7 +13,7 @@ import numpy as np
 from torch.utils.data import Dataset, DataLoader
 
 
-class Method_MLP(method, nn.Module):
+class Method_CNN(method, nn.Module):
     data = None
     # it defines the max rounds to train the model
     max_epoch = 100
@@ -26,27 +26,44 @@ class Method_MLP(method, nn.Module):
     def __init__(self, mName, mDescription):
         method.__init__(self, mName, mDescription)
         nn.Module.__init__(self)
-        # check here for nn.Linear doc: https://pytorch.org/docs/stable/generated/torch.nn.Linear.html
-        self.fc_layer_1 = nn.Linear(784, 100)
-        # check here for nn.ReLU doc: https://pytorch.org/docs/stable/generated/torch.nn.ReLU.html
-        self.activation_func_1 = nn.ReLU()
-        self.fc_layer_2 = nn.Linear(100, 10)
-        # check here for nn.Softmax doc: https://pytorch.org/docs/stable/generated/torch.nn.Softmax.html
-        self.activation_func_2 = nn.Softmax(dim=1)
+        # Convolution 1
+        self.cnn1 = nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, stride=1, padding=0)
+        self.relu1 = nn.ReLU()
+        
+        # Max pool 1
+        self.maxpool1 = nn.MaxPool2d(kernel_size=2)
+     
+        # Convolution 2
+        self.cnn2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=0)
+        self.relu2 = nn.ReLU()
+        
+        # Max pool 2
+        self.maxpool2 = nn.MaxPool2d(kernel_size=2)
+        
+        # Fully connected 1
+        self.fc1 = nn.Linear(32 * 5 * 5, 10) 
 
     # it defines the forward propagation function for input x
     # this function will calculate the output layer by layer
 
     def forward(self, x):
-        '''Forward propagation'''
-        # hidden layer embeddings
-        h = self.activation_func_1(self.fc_layer_1(x))
-        # outout layer result
-        # self.fc_layer_2(h) will be a nx2 tensor
-        # n (denotes the input instance number): 0th dimension; 2 (denotes the class number): 1st dimension
-        # we do softmax along dim=1 to get the normalized classification probability distributions for each instance
-        y_pred = self.activation_func_2(self.fc_layer_2(h))
-        return y_pred
+         # Set 1
+        out = self.cnn1(x)
+        out = self.relu1(out)
+        out = self.maxpool1(out)
+        
+        # Set 2
+        out = self.cnn2(out)
+        out = self.relu2(out)
+        out = self.maxpool2(out)
+        
+        #Flatten
+        out = out.view(out.size(0), -1)
+
+        #Dense
+        out = self.fc1(out)
+        
+        return out
 
     # backward error propagation will be implemented by pytorch automatically
     # so we don't need to define the error backpropagation function here

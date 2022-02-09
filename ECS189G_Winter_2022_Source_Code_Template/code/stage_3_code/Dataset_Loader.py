@@ -24,8 +24,10 @@ class Dataset_Loader(dataset):
         
     def __getitem__(self, idx):
         row = self.data[idx]
-        # print('james row:', row[0][0])
-        return row[0], row[1]
+        image_t = torch.Tensor(row['image'])
+        image =  torch.unsqueeze(image_t, dim=0)
+        # print("IMG SHAPE: ", image.shape)
+        return image, row['label']
 
     def get_data(self):
         print("dataset_source_folder_path: ",self.dataset_source_folder_path)
@@ -36,16 +38,16 @@ class Dataset_Loader(dataset):
             dataset = open_data['train']
         else:
             dataset = open_data['test']
-        returnSpamReader = []
-        for pair in dataset:
-            elements = []
-            # plt.imshow(pair['image'], cmap="Greys")
-            # plt.show()
-            # print(pair['label'])
-            # print(pair['image'])
-            elements.append(torch.Tensor(pair['image']))
-            elements.append(pair['label'])
-            # print(elements[0])
-            # elements.append(pair['label'])
-            returnSpamReader.append(elements)
-        return returnSpamReader
+        # returnSpamReader = []
+        # for pair in dataset:
+        #     elements = []
+        #     # plt.imshow(pair['image'], cmap="Greys")
+        #     # plt.show()
+        #     # print(pair['label'])
+        #     # print(pair['image'])
+        #     elements.append(torch.Tensor(pair['image']))
+        #     elements.append(pair['label'])
+        #     # print(elements[0])
+        #     # elements.append(pair['label'])
+        #     returnSpamReader.append(elements)
+        return dataset

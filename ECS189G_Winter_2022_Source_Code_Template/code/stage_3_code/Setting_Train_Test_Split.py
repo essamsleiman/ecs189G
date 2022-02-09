@@ -27,7 +27,7 @@ class Setting_Train_Test_Split(setting):
         # save raw ResultModule
         self.result.data = learned_result
         self.result.save()
-            
+   
         self.evaluate.data = learned_result
         
         return self.evaluate.evaluate(), None
