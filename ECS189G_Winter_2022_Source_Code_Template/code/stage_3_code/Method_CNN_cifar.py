@@ -16,9 +16,9 @@ from torch.utils.data import Dataset, DataLoader
 class Method_CNN(method, nn.Module):
     data = None
     # it defines the max rounds to train the model
-    max_epoch = 100
+    max_epoch = 20
     # it defines the learning rate for gradient descent based optimizer for model learning
-    learning_rate = 1e-3
+    learning_rate = 1e-5
 
     # it defines the the MLP model architecture, e.g.,
     # how many layers, size of variables in each layer, activation function, etc.
@@ -27,7 +27,7 @@ class Method_CNN(method, nn.Module):
         method.__init__(self, mName, mDescription)
         nn.Module.__init__(self)
         # Convolution 1
-        self.cnn1 = nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, stride=1, padding=0)
+        self.cnn1 = nn.Conv2d(in_channels=3, out_channels=16, kernel_size=3, stride=1, padding=0)
         self.relu1 = nn.ReLU()
         
         # Max pool 1
@@ -41,7 +41,7 @@ class Method_CNN(method, nn.Module):
         self.maxpool2 = nn.MaxPool2d(kernel_size=2)
         
         # Fully connected 1
-        self.fc1 = nn.Linear(32 * 5 * 5, 10) 
+        self.fc1 = nn.Linear(17472, 40)
 
     # it defines the forward propagation function for input x
     # this function will calculate the output layer by layer
@@ -61,6 +61,7 @@ class Method_CNN(method, nn.Module):
         out = out.view(out.size(0), -1)
 
         #Dense
+        # print("OUT DIM: ", out.shape)
         out = self.fc1(out)
         
         return out
@@ -70,8 +71,8 @@ class Method_CNN(method, nn.Module):
 
     def train(self, data_loader):
         # check here for the torch.optim doc: https://pytorch.org/docs/stable/optim.html
-        #optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate, betas=(0.9, 0.999), eps=1e-8)
-        optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
+        optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate, betas=(0.9, 0.999), eps=1e-8)
+        # optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
 
 
         # check here for the nn.CrossEntropyLoss doc: https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html

@@ -40,5 +40,3 @@ class Setting_KFold_CV(setting):
             score_list.append(self.evaluate.evaluate())
         
         return np.mean(score_list), np.std(score_list)
-
-        
