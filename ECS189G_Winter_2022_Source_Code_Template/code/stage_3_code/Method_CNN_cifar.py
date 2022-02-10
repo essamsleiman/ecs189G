@@ -16,9 +16,9 @@ from torch.utils.data import Dataset, DataLoader
 class Method_CNN(method, nn.Module):
     data = None
     # it defines the max rounds to train the model
-    max_epoch = 20
+    max_epoch = 100
     # it defines the learning rate for gradient descent based optimizer for model learning
-    learning_rate = 1e-5
+    learning_rate = 1e-3
 
     # it defines the the MLP model architecture, e.g.,
     # how many layers, size of variables in each layer, activation function, etc.
@@ -41,7 +41,7 @@ class Method_CNN(method, nn.Module):
         self.maxpool2 = nn.MaxPool2d(kernel_size=2)
         
         # Fully connected 1
-        self.fc1 = nn.Linear(17472, 40)
+        self.fc1 = nn.Linear(1152, 10)
 
     # it defines the forward propagation function for input x
     # this function will calculate the output layer by layer
