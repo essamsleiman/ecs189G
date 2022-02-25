@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import torch
 import os
 import string
+from sklearn import preprocessing
 
 class Dataset_Loader(dataset):
     #data = None
@@ -26,16 +27,25 @@ class Dataset_Loader(dataset):
         
     def __getitem__(self, idx):
         row = self.data[idx]
-        image_t = torch.Tensor(row['text'])
-        image = image_t
+        # print(row['text'])
+        text_t = torch.Tensor(row['text'])
+        text = text_t
         # image =  torch.unsqueeze(image_t, dim=0)
         # print("IMG SHAPE1: ", image_t.shape)
         # image =  torch.unsqueeze(image_t, dim=0)
 
         # [112, 92, 3]
-        image = image_t.view(3, 32, 32)
+        # text = text_t.view(3, 32, 32)
         # print("IMG SHAPE2: ", image.shape)
-        return image, row['label']
+        return text, row['label']
+    
+    def to_ascii(self, text):
+        # labels = ['cat', 'dog', 'mouse', 'elephant', 'pandas']
+        # le = preprocessing.LabelEncoder()
+        # targets = le.fit_transform(labels)
+        # print(targets)
+        ascii_values = [ord(character) for character in text]
+        return ascii_values
 
     def cleanup(self, text):
         # split into words by white space
@@ -62,31 +72,27 @@ class Dataset_Loader(dataset):
         # print(postitve)
         for filename in os.listdir(postitve):
             f = os.path.join(postitve, filename)
-            print("JAMES: ", filename)
+           #  print("JAMES: ", filename)
             # checking if it is a file
             if os.path.isfile(f):
                 myfile = open(f, 'r')
-                # this readlines() function allows us to get the content of the text file
-                # print(myfile.readlines())
-                # print(myfile.read())
                 mytext = self.cleanup(myfile.read())
-                dataset.append({'text': mytext, 'label': 0})
-                # print(f)
-        # print("JAMES DATASET")
-        # print(dataset)
+                le = preprocessing.LabelEncoder()
+                targets = le.fit_transform(mytext)
+                # print(targets)
+                dataset.append({'text': targets, 'label': 0})
 
         negative = self.dataset_source_folder_path + "/neg"
-        # print(negative)
+
         for filename in os.listdir(negative):
             f = os.path.join(negative, filename)
             # checking if it is a file
             if os.path.isfile(f):
                 myfile = open(f, 'r')
                 mytext = self.cleanup(myfile.read())
-                dataset.append({'text': mytext, 'label': 1})
-                # this readlines() function allows us to get the content of the text file
-                # print(myfile.readlines())
-                # print(f)
+                le = preprocessing.LabelEncoder()
+                targets = le.fit_transform(mytext)
+                dataset.append({'text': targets, 'label': 1})
 
         # 0 for postitive, 1 for negative
 

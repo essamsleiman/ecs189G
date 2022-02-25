@@ -13,58 +13,78 @@ import numpy as np
 from torch.utils.data import Dataset, DataLoader
 
 
-class Method_CNN(method, nn.Module):
+
+
+class Method_RNN(method, nn.Module):
     data = None
     # it defines the max rounds to train the model
-    max_epoch = 500
+    max_epoch = 20
     # it defines the learning rate for gradient descent based optimizer for model learning
     learning_rate = 1e-4
 
     # it defines the the MLP model architecture, e.g.,
     # how many layers, size of variables in each layer, activation function, etc.
     # the size of the input/output portal of the model architecture should be consistent with our data input and desired output
-    def __init__(self, mName, mDescription):
+    def __init__(self,  mName, mDescription):
         method.__init__(self, mName, mDescription)
+        super(Method_RNN, self).__init__()
         nn.Module.__init__(self)
-        # Convolution 1
-        self.cnn1 = nn.Conv2d(in_channels=3, out_channels=16, kernel_size=3, stride=1, padding=0)
-        self.relu1 = nn.ReLU()
+
+        hidden_dim = 128
+        input_size = 2
+        n_layers = 2
+        output_size = 2
         
-        # Max pool 1
-        self.maxpool1 = nn.MaxPool2d(kernel_size=2)
-     
-        # Convolution 2
-        self.cnn2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=0)
-        self.relu2 = nn.ReLU()
-        
-        # Max pool 2
-        self.maxpool2 = nn.MaxPool2d(kernel_size=2)
-        
-        # Fully connected 1
-        self.fc1 = nn.Linear(1152, 10)
+        # Defining some parameters
+        self.hidden_dim = hidden_dim
+        self.n_layers = n_layers
+
+        #Defining the layers
+        # RNN Layer
+        self.rnn = nn.RNN(input_size, hidden_dim, n_layers, batch_first=True)   
+        # Fully connected layer
+        self.fc = nn.Linear(hidden_dim, output_size)
+
+        # self.i2h = nn.Linear(input_size + hidden_size, hidden_size)
+        # self.i2o = nn.Linear(input_size + hidden_size, output_size)
+        # self.softmax = nn.LogSoftmax(dim=1)
+
 
     # it defines the forward propagation function for input x
     # this function will calculate the output layer by layer
 
-    def forward(self, x):
-         # Set 1
-        out = self.cnn1(x)
-        out = self.relu1(out)
-        out = self.maxpool1(out)
-        
-        # Set 2
-        out = self.cnn2(out)
-        out = self.relu2(out)
-        out = self.maxpool2(out)
-        
-        #Flatten
-        out = out.view(out.size(0), -1)
+    # def forward(self, input, hidden):
+    #     combined = torch.cat((input, hidden), 1)
+    #     hidden = self.i2h(combined)
+    #     output = self.i2o(combined)
+    #     output = self.softmax(output)
+    #     return output, hidden
 
-        #Dense
-        # print("OUT DIM: ", out.shape)
-        out = self.fc1(out)
+    def forward(self, x):
+        batch_size = x.size(0)
+
+        # Initializing hidden state for first input using method defined below
+        hidden = self.init_hidden(batch_size)
+
+        # Passing in the input and hidden state into the model and obtaining outputs
+        print(x)
+        out, hidden = self.rnn(x, hidden)
         
-        return out
+        # Reshaping the outputs such that it can be fit into the fully connected layer
+        out = out.contiguous().view(-1, self.hidden_dim)
+        out = self.fc(out)
+        
+        return out, hidden
+
+    def init_hidden(self, batch_size):
+        # This method generates the first hidden state of zeros which we'll use in the forward pass
+        # We'll send the tensor holding the hidden state to the device we specified earlier as well
+        hidden = torch.zeros(self.n_layers, batch_size, self.hidden_dim)
+        return hidden
+
+
+    def initHidden(self):
+        return torch.zeros(1, self.hidden_size)
 
     # backward error propagation will be implemented by pytorch automatically
     # so we don't need to define the error backpropagation function here

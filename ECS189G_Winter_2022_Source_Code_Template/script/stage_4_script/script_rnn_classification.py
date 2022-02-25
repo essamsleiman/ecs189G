@@ -1,5 +1,5 @@
 from code.stage_4_code.Dataset_Loader_classification import Dataset_Loader
-from code.stage_4_code.Method_RNN_classification import Method_CNN
+from code.stage_4_code.Method_RNN_classification import Method_RNN
 from code.stage_4_code.Result_Saver import Result_Saver
 from code.stage_4_code.Setting_KFold_CV import Setting_KFold_CV
 from code.stage_4_code.Setting_Train_Test_Split import Setting_Train_Test_Split
@@ -20,12 +20,11 @@ if 1:
     data_obj.dataset_source_folder_path = '../../data/stage_4_data/text_classification_small/train'
     data_obj.dataset_type = 'train'
 
-    # test_data_obj = Dataset_Loader('ORL', '')
-    # test_data_obj.dataset_source_folder_path = '../../data/stage_4_data/'
-    # test_data_obj.dataset_source_file_name = 'ORL'
-    # test_data_obj.dataset_type = 'test'
+    test_data_obj = Dataset_Loader('classification', '')
+    data_obj.dataset_source_folder_path = '../../data/stage_4_data/text_classification_small/test'
+    test_data_obj.dataset_type = 'test'
 
-    method_obj = Method_CNN('convolutional neural network', '')
+    method_obj = Method_RNN('recurrant neural network', '')
 
     result_obj = Result_Saver('saver', '')
     result_obj.result_destination_folder_path = '../../result/stage_4_result/MLP_'
@@ -45,7 +44,7 @@ if 1:
     setting_obj.prepare(data_obj, data_obj, method_obj, result_obj, evaluate_obj)
     setting_obj.print_setup_summary()
     mean_score, std_score = setting_obj.load_run_save_evaluate()
-    # print('************ Overall Performance ************')
-    # print('MLP Accuracy: ' + str(mean_score) + ' +/- ' + str(std_score))
-    # print('************ Finish ************')
+    print('************ Overall Performance ************')
+    print('MLP Accuracy: ' + str(mean_score) + ' +/- ' + str(std_score))
+    print('************ Finish ************')
     # # ------------------------------------------------------
