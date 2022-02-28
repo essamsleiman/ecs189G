@@ -17,11 +17,11 @@ if 1:
 
     # ---- objection initialization setction ---------------
     data_obj = Dataset_Loader('classification', '')
-    data_obj.dataset_source_folder_path = '../../data/stage_4_data/text_classification_small/train'
+    data_obj.dataset_source_folder_path = '../../data/stage_4_data/text_classification/train'
     data_obj.dataset_type = 'train'
 
     test_data_obj = Dataset_Loader('classification', '')
-    data_obj.dataset_source_folder_path = '../../data/stage_4_data/text_classification_small/test'
+    data_obj.dataset_source_folder_path = '../../data/stage_4_data/text_classification/test'
     test_data_obj.dataset_type = 'test'
 
     method_obj = Method_RNN('recurrant neural network', '')
@@ -32,11 +32,10 @@ if 1:
 
     setting_obj = Setting_Train_Test_Split('setting train test split', '')
 
-    
 
     evaluate_obj = Evaluate_Accuracy('accuracy', '')
 
-    
+
     # ------------------------------------------------------
 
     # # ---- running section ---------------------------------

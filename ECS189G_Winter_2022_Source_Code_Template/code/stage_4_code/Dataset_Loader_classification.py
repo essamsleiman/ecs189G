@@ -5,6 +5,7 @@ Concrete IO class for a specific dataset
 # Copyright (c) 2017-Current Jiawei Zhang <jiawei@ifmlab.org>
 # License: TBD
 
+from calendar import c
 from code.base_class.dataset import dataset
 import pickle
 import matplotlib.pyplot as plt
@@ -12,7 +13,7 @@ import torch
 import os
 import string
 from sklearn import preprocessing
-
+import random
 class Dataset_Loader(dataset):
     #data = None
     dataset_source_folder_path = None
@@ -28,15 +29,9 @@ class Dataset_Loader(dataset):
     def __getitem__(self, idx):
         row = self.data[idx]
         # print(row['text'])
-        text_t = torch.Tensor(row['text'])
+        text_t = torch.tensor(row['text'], dtype=torch.long)
         text = text_t
-        # image =  torch.unsqueeze(image_t, dim=0)
-        # print("IMG SHAPE1: ", image_t.shape)
-        # image =  torch.unsqueeze(image_t, dim=0)
 
-        # [112, 92, 3]
-        # text = text_t.view(3, 32, 32)
-        # print("IMG SHAPE2: ", image.shape)
         return text, row['label']
     
     def to_ascii(self, text):
@@ -66,34 +61,52 @@ class Dataset_Loader(dataset):
         # iterate over files in
         # that directory
         postitve = self.dataset_source_folder_path + "/pos"
-
+        print("POS: ", postitve)
         dataset = []
+        essamTestDataset = []
 
         # print(postitve)
+        le = preprocessing.LabelEncoder()
+        count_pos = 0
         for filename in os.listdir(postitve):
+            if count_pos == 500:
+                break
+            count_pos+=1
+
             f = os.path.join(postitve, filename)
            #  print("JAMES: ", filename)
             # checking if it is a file
             if os.path.isfile(f):
                 myfile = open(f, 'r')
                 mytext = self.cleanup(myfile.read())
-                le = preprocessing.LabelEncoder()
                 targets = le.fit_transform(mytext)
+                
                 # print(targets)
                 dataset.append({'text': targets, 'label': 0})
+                essamTestDataset.extend(targets)
 
         negative = self.dataset_source_folder_path + "/neg"
-
+        count_neg = 0
         for filename in os.listdir(negative):
+            if count_neg == 500:
+                break
+            count_neg+=1
             f = os.path.join(negative, filename)
             # checking if it is a file
             if os.path.isfile(f):
                 myfile = open(f, 'r')
                 mytext = self.cleanup(myfile.read())
-                le = preprocessing.LabelEncoder()
+                # le = preprocessing.LabelEncoder()
                 targets = le.fit_transform(mytext)
                 dataset.append({'text': targets, 'label': 1})
+                essamTestDataset.extend(targets)
 
         # 0 for postitive, 1 for negative
+        # print("LEN DATA: ", dataset)
+        # setEssam = set(essamTestDataset)
+        # print("SUMA: ", setEssam, len(setEssam), max(setEssam)) this cage us size of vocab list
+        # le_name_mapping = dict(zip(le.classes_, le.transform(le.classes_)))
 
+        # print("OMG: ", le_name_mapping)
+        random.shuffle(dataset)
         return dataset
