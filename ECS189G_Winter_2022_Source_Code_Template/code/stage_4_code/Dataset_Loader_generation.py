@@ -16,6 +16,8 @@ from sklearn import preprocessing
 import random
 import pandas as pd
 from collections import Counter
+import re
+
 
 
 class Dataset_Loader(dataset):
@@ -39,10 +41,21 @@ class Dataset_Loader(dataset):
     #     text = train_df['Joke'].str.cat(sep=' ')
     #     return text.split(' ')
 
+    def cleanup(self, text):
+        # split into words by white space
+        # print(text)
+        # words = text.split()
+        mytext = re.findall(r"[\w']+|[.,!?;]", text)
+        words = [word.lower() for word in mytext]
+        # print(words)
+
+        return words
+
     def get_data(self):
         train_df = pd.read_csv(self.dataset_source_folder_path + '/' + self.dataset_source_file_name)
         text = train_df['Joke'].str.cat(sep=' ')
-        self.words = text.split(' ')
+        self.words = self.cleanup(text)
+        # self.words = text.split(' ')
         self.uniq_words = self.get_uniq_words()
         # print("james: ", self.uniq_words)
 

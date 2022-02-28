@@ -62,8 +62,10 @@ class Method_RNN(method, nn.Module):
         # dataloader = DataLoader(data_loader, batch_size=args.batch_size)
         criterion = nn.CrossEntropyLoss()
         optimizer = torch.optim.Adam(self.parameters(), lr=0.001)
+        train_loss_total_list = []
 
         for epoch in range(self.max_epoch):
+            train_loss_epoch_list = []
             state_h, state_c = self.init_state(self.dataset.args.sequence_length)
 
             for batch, (x, y) in enumerate(data_loader):
@@ -78,7 +80,13 @@ class Method_RNN(method, nn.Module):
                 loss.backward()
                 optimizer.step()
 
-                print({ 'epoch': epoch, 'batch': batch, 'loss': loss.item() })
+                train_loss_epoch_list.append(loss.item())
+
+                # print({ 'epoch': epoch, 'batch': batch, 'loss': loss.item() })
+            avg_loss = sum(train_loss_epoch_list) / len(train_loss_epoch_list)
+            train_loss_total_list.append(avg_loss)
+            print({ 'epoch': epoch, 'loss': avg_loss })
+        print("TOTAL LOSS: ", train_loss_total_list)
     
     def test(self, data_loader):
         # do the testing, and result the result
@@ -93,7 +101,7 @@ class Method_RNN(method, nn.Module):
             # instances will get the labels corresponding to the largest probability
         return total_pred, actual_y
     
-    def predict(self, text, next_words=100):
+    def predict(self, text, next_words=14):
         # self.eval()
 
         words = text.split(' ')
@@ -101,13 +109,16 @@ class Method_RNN(method, nn.Module):
         # print("james: ", self.dataset.uniq_words)
 
         for i in range(0, next_words):
-            x = torch.tensor([[self.dataset.word_to_index[w] for w in words[i:]]])
-            y_pred, (state_h, state_c) = self(x, (state_h, state_c))
+            try:
+                x = torch.tensor([[self.dataset.word_to_index[w] for w in words[i:]]])
+                y_pred, (state_h, state_c) = self(x, (state_h, state_c))
 
-            last_word_logits = y_pred[0][-1]
-            p = torch.nn.functional.softmax(last_word_logits, dim=0).detach().numpy()
-            word_index = np.random.choice(len(last_word_logits), p=p)
-            words.append(self.dataset.index_to_word[word_index])
+                last_word_logits = y_pred[0][-1]
+                p = torch.nn.functional.softmax(last_word_logits, dim=0).detach().numpy()
+                word_index = np.random.choice(len(last_word_logits), p=p)
+                words.append(self.dataset.index_to_word[word_index])
+            except:
+                return ['invalid input']
 
         return words
     
@@ -115,67 +126,10 @@ class Method_RNN(method, nn.Module):
         print('method running...')
         print('--start training...')
         self.train(self.data['train'], )
-        # self.train(self.data['train'])
-        # print('--start testing...')
-        # pred_y, actual_y = self.test(self.data['test'])
-        input_item = input("Enter a start to a joke ")
-        print(self.predict(input_item))
-        # print("pred_y: ", pred_y)
-        # print("actual_y: ", actual_y)
-        # return {'pred_y': pred_y, 'true_y': actual_y}
-            
-
-
-
-
-
-   # def train(self, data_loader):
-    #     # check here for the torch.optim doc: https://pytorch.org/docs/stable/optim.html
-    #     optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate, betas=(0.9, 0.999), eps=1e-8)
-    #     # optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
-
-
-    #     # check here for the nn.CrossEntropyLoss doc: https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
-    #     loss_function = nn.CrossEntropyLoss()
-    #     # for training accuracy investigation purpose
-    #     accuracy_evaluator = Evaluate_Accuracy('training evaluator', '')
-    #     # shuffle = True?
-    #     # train_dataloader = DataLoader([X, y], batch_size=64)
-    #     # it will be an iterative gradient updating process
-    #     # we don't do mini-batch, we use the whole input as one batch
-    #     # you can try to split X and y into smaller-sized batches by yourself
-    #     train_loss_total_list = []
-    #     for epoch in range(self.max_epoch): # you can do an early stop if self.max_epoch is too much...
-    #         # get the output, we need to covert X into torch.tensor so pytorch algorithm can operate on it
-    #         print("epoch: ", epoch)
-    #         y_pred_total = []
-    #         y_true_total = []
-    #         train_loss_epoch_list = []
-    #         for i, (X,y) in enumerate(data_loader):
-    #             optimizer.zero_grad()
-    #             y_pred, hidden = self.forward(X)
-    #             #print("y_pred: ", y_pred)
-    #             y_pred_total.extend(y_pred.max(1)[1])
-
-    #             # convert y to torch.tensor as well
-    #             y_true = torch.LongTensor(np.array(y))
-    #             y_true_total.extend(y_true)
-    #             # calculate the training loss
-
-    #             train_loss = loss_function(y_pred, y_true)
-    #             train_loss_epoch_list.append(train_loss.item())
-    #             # check here for the gradient init doc: https://pytorch.org/docs/stable/generated/torch.optim.Optimizer.zero_grad.html
-                
-
-    #             # check here for the loss.backward doc: https://pytorch.org/docs/stable/generated/torch.Tensor.backward.html
-    #             # do the error backpropagation to calculate the gradients
-    #             train_loss.backward()
-    #             # check here for the opti.step doc: https://pytorch.org/docs/stable/optim.html
-    #             # update the variables according to the optimizer and the gradients calculated by the above loss.backward function
-    #             optimizer.step()
-    #         avg_loss = sum(train_loss_epoch_list) / len(train_loss_epoch_list)
-    #         train_loss_total_list.append(avg_loss)
-    #         # if epoch%100 == 0:
-    #         accuracy_evaluator.data = {'true_y': y_true_total, 'pred_y': y_pred_total}
-    #         print('Epoch:', epoch, 'Accuracy:', accuracy_evaluator.evaluate(), 'Loss:', avg_loss)
-    #     print("TOTAL LOSS: ", train_loss_total_list)
+        while True:
+            input_item = input("Enter a start to a joke: ")
+            words = self.predict(input_item)
+            res_str = ""
+            for word in words:
+                res_str = res_str + " " + word
+            print(res_str)
