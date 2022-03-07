@@ -15,7 +15,7 @@ from torch.utils.data import Dataset, DataLoader
 class Method_RNN(method, nn.Module):
     data = None
     # it defines the max rounds to train the model
-    max_epoch = 1
+    max_epoch = 45
     # it defines the learning rate for gradient descent based optimizer for model learning
     learning_rate = .001
 
@@ -28,8 +28,8 @@ class Method_RNN(method, nn.Module):
         nn.Module.__init__(self)
 
 
-        self.lstm_size = 128
-        self.embedding_dim = 128
+        self.lstm_size = 256
+        self.embedding_dim = 256
         self.num_layers = 3
         self.dataset = dataset
         dataset.get_data()
@@ -101,7 +101,7 @@ class Method_RNN(method, nn.Module):
             # instances will get the labels corresponding to the largest probability
         return total_pred, actual_y
     
-    def predict(self, text, next_words=14):
+    def predict(self, text, next_words=25):
         # self.eval()
 
         words = text.split(' ')

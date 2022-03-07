@@ -17,8 +17,8 @@ class Setting_Train_Test_Split(setting):
         self.trainDataset.data = self.trainDataset.get_data()
         self.testDataset.data = self.testDataset.get_data()
 
-        train_dataloader = DataLoader(self.trainDataset, batch_size=1)
-        test_dataloader = DataLoader(self.testDataset, batch_size=1)   
+        train_dataloader = DataLoader(self.trainDataset, batch_size=64)
+        test_dataloader = DataLoader(self.testDataset, batch_size=64)   
 
         # run MethodModule
         self.method.data = {'train': train_dataloader, 'test': test_dataloader}
