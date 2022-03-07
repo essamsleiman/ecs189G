@@ -23,9 +23,10 @@ class setting:
     result = None
     evaluate = None
 
-    def __init__(self, sName=None, sDescription=None):
+    def __init__(self, dataset, sName=None, sDescription=None):
         self.setting_name = sName
         self.setting_description = sDescription
+        self.dataset_object = dataset
     
     def prepare(self, trainDataset, testDataset, sMethod, sResult, sEvaluate):
         self.trainDataset = trainDataset
